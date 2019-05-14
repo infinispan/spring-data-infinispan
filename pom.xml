@@ -6,23 +6,31 @@
 
     <groupId>org.infinispan</groupId>
     <artifactId>spring-data-infinispan</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
 
     <name>Spring Data Infinispan</name>
 
-    <description>Spring Data module for Infinispan repositories.</description>
+    <description>Spring Data module for Infinispan Remote Repositories.</description>
 
     <parent>
         <groupId>org.springframework.data.build</groupId>
         <artifactId>spring-data-parent</artifactId>
-        <version>2.0.8.RELEASE</version>
+        <version>2.1.8.RELEASE</version>
     </parent>
 
     <properties>
-        <infinispan>9.3.1.Final</infinispan>
+        <infinispan>10.0.0.Beta3</infinispan>
+        <junit.jupiter.version>5.3.1</junit.jupiter.version>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springdata.keyvalue>2.1.8.RELEASE</springdata.keyvalue>
+        <jboss.releases.nexus.url>https://repository.jboss.org/nexus</jboss.releases.nexus.url>
+        <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
+        <jboss.releases.repo.url>${jboss.releases.nexus.url}/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
+        <version.maven.failsafe>3.0.0-M3</version.maven.failsafe>
+        <version.maven.surefire>3.0.0-M3</version.maven.surefire>
+        <version.maven.source>3.0.1</version.maven.source>
+        <version.maven.scm>1</version.maven.scm>
     </properties>
 
 
@@ -36,9 +44,86 @@
 
         <dependency>
             <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-core</artifactId>
+            <artifactId>infinispan-client-hotrod</artifactId>
             <version>${infinispan}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-query-dsl</artifactId>
+            <version>${infinispan}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-remote-query-client</artifactId>
+            <version>${infinispan}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-junit5</artifactId>
+            <version>0.2-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-scm-plugin</artifactId>
+                    <version>${version.maven.scm}</version>
+                    <configuration>
+                        <tag>${project.version}</tag>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${version.maven.source}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.maven.surefire}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${version.maven.failsafe}</version>
+            </plugin>
+            <!-- Make sure we generate src jars too -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>true</inherited>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,0 +1,17 @@
+== Community
+
+=== Chat with developers
+
+Zulip
+
+=== Stack Overflow
+
+Submit your question with `infinispan` and `spring-data-infinispan` tags.
+
+
+# License
+
+Infinispan is available under the Apache 2 License. Please see the Licensing appendix for more information.
+
+Visit http://www.infinispan.org for more information.
+
