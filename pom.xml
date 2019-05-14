@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.infinispan</groupId>
+    <artifactId>spring-data-infinispan</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>Spring Data Infinispan</name>
+
+    <description>Spring Data module for Infinispan repositories.</description>
+
+    <parent>
+        <groupId>org.springframework.data.build</groupId>
+        <artifactId>spring-data-parent</artifactId>
+        <version>2.0.8.RELEASE</version>
+    </parent>
+
+    <properties>
+        <infinispan>9.3.1.Final</infinispan>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springdata.keyvalue>2.1.8.RELEASE</springdata.keyvalue>
+    </properties>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-keyvalue</artifactId>
+            <version>${springdata.keyvalue}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <version>${infinispan}</version>
+        </dependency>
+
+    </dependencies>
+</project>
