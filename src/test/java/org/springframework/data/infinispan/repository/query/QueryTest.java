@@ -37,6 +37,14 @@ public class QueryTest extends InfinispanSpringDataTest {
    }
 
    @Test
+   public void findByLastnameIsNotNull() {
+      List<Person> people = personRepository.findByLastnameIsNotNull();
+      assertThat(people).hasSize(1);
+      Person person = people.get(0);
+      assertThat(person.getFirstname()).isEqualTo(OIHANA.getFirstname());
+   }
+
+   @Test
    public void findByIsBasqueTrue(){
       List<Person> people = personRepository.findByIsBasqueTrue();
       assertThat(people).containsExactlyInAnyOrder(OIHANA, ELAIA);

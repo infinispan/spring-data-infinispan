@@ -62,6 +62,8 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
             return from.having(property).eq(false);
          case IS_NULL:
             return from.having(property).isNull();
+         case IS_NOT_NULL:
+            return from.not().having(property).isNull();
          case SIMPLE_PROPERTY:
             return from.having(property).eq(iterator.next());
          default:

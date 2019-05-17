@@ -10,6 +10,8 @@ public interface PersonRepository extends InfinispanRepository<Person, String> {
 
    List<Person> findByLastnameIsNull();
 
+   List<Person> findByLastnameIsNotNull();
+
    List<Person> findByIsBasqueTrue();
 
    List<Person> findByIsBigSisterFalse();
