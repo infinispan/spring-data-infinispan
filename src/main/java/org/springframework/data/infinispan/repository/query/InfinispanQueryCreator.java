@@ -66,6 +66,8 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
             return from.not().having(property).isNull();
          case SIMPLE_PROPERTY:
             return from.having(property).eq(iterator.next());
+         case NEGATING_SIMPLE_PROPERTY:
+            return from.not().having(property).eq(iterator.next());
          default:
             throw new InvalidDataAccessApiUsageException(String.format("Unsupported type '%s'", type));
       }

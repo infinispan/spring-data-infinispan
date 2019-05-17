@@ -6,15 +6,16 @@ import static org.infinispan.test.example.TestData.OIHANA;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.infinispan.test.common.InfinispanSpringDataTest;
 import org.infinispan.test.example.Person;
 import org.infinispan.test.example.PersonRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class QueryTest extends InfinispanSpringDataTest {
 
-   @Autowired
+   @Resource
    private PersonRepository personRepository;
 
    @Test
@@ -23,35 +24,35 @@ public class QueryTest extends InfinispanSpringDataTest {
       assertThat(emptyPeople).isEmpty();
 
       List<Person> people = personRepository.findByFirstname("oihana");
-      assertThat(people).hasSize(1);
-      Person person = people.get(0);
-      assertThat(person.getFirstname()).isEqualTo(OIHANA.getFirstname());
+      assertThat(people).containsExactly(OIHANA);
+   }
+
+   @Test
+   public void findByFirstnameNot() {
+      List<Person> people = personRepository.findByFirstnameNot("elaia");
+      assertThat(people).containsExactly(OIHANA);
    }
 
    @Test
    public void findByLastnameIsNull() {
       List<Person> people = personRepository.findByLastnameIsNull();
-      assertThat(people).hasSize(1);
-      Person person = people.get(0);
-      assertThat(person.getFirstname()).isEqualTo(ELAIA.getFirstname());
+      assertThat(people).containsExactly(ELAIA);
    }
 
    @Test
    public void findByLastnameIsNotNull() {
       List<Person> people = personRepository.findByLastnameIsNotNull();
-      assertThat(people).hasSize(1);
-      Person person = people.get(0);
-      assertThat(person.getFirstname()).isEqualTo(OIHANA.getFirstname());
+      assertThat(people).containsExactly(OIHANA);
    }
 
    @Test
-   public void findByIsBasqueTrue(){
+   public void findByIsBasqueTrue() {
       List<Person> people = personRepository.findByIsBasqueTrue();
       assertThat(people).containsExactlyInAnyOrder(OIHANA, ELAIA);
    }
 
    @Test
-   public void findByIsBigSisterFalse(){
+   public void findByIsBigSisterFalse() {
       List<Person> people = personRepository.findByIsBigSisterFalse();
       assertThat(people).containsExactlyInAnyOrder(ELAIA);
    }
