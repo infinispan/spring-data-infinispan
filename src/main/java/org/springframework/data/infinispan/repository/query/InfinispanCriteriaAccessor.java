@@ -4,6 +4,11 @@ import org.infinispan.query.dsl.QueryBuilder;
 import org.springframework.data.keyvalue.core.CriteriaAccessor;
 import org.springframework.data.keyvalue.core.query.KeyValueQuery;
 
+/**
+ * Provides the mechanism to convert a KeyValueQuery into an Infinispan QueryBuilder
+ *
+ * @author Katia Aresti
+ */
 public class InfinispanCriteriaAccessor implements CriteriaAccessor<QueryBuilder> {
 
    @Override

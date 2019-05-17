@@ -10,6 +10,11 @@ import org.springframework.data.keyvalue.core.KeyValueTemplate;
 import org.springframework.data.keyvalue.repository.config.KeyValueRepositoryConfigurationExtension;
 import org.springframework.data.repository.config.RepositoryConfigurationSource;
 
+/**
+ * Infinispan specific {@link KeyValueRepositoryConfigurationExtension}.
+ *
+ * @author Katia Aresti
+ */
 public class InfinispanRepositoryConfigurationExtension extends KeyValueRepositoryConfigurationExtension {
 
    @Override
