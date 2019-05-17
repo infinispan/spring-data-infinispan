@@ -2,10 +2,7 @@ package org.springframework.data.infinispan.repository.query;
 
 import java.util.Iterator;
 
-import org.infinispan.client.hotrod.RemoteCache;
-import org.infinispan.client.hotrod.Search;
 import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
-import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -18,14 +15,15 @@ import org.springframework.data.repository.query.parser.PartTree;
 
 public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<QueryBuilder>, FilterConditionContextQueryBuilder> {
 
-   private RemoteCache cache;
+   private QueryFactory queryFactory;
 
    public InfinispanQueryCreator(PartTree tree) {
       super(tree);
    }
 
-   public InfinispanQueryCreator(PartTree tree, ParameterAccessor parameters) {
+   public InfinispanQueryCreator(PartTree tree, ParameterAccessor parameters, QueryFactory queryFactory) {
       super(tree, parameters);
+      this.queryFactory = queryFactory;
    }
 
    @Override
@@ -55,7 +53,6 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
       String property = part.getProperty().toDotPath();
       Part.Type type = part.getType();
 
-      QueryFactory queryFactory = Search.getQueryFactory(cache);
       QueryBuilder from = queryFactory.from(part.getProperty().getOwningType().getType().getName());
 
       switch (type) {
@@ -64,9 +61,5 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
          default:
             throw new InvalidDataAccessApiUsageException(String.format("Unsupported type '%s'", type));
       }
-   }
-
-   public void setRemoteCache(RemoteCache cache) {
-      this.cache = cache;
    }
 }

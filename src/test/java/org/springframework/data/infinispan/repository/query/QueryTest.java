@@ -1,11 +1,9 @@
 package org.springframework.data.infinispan.repository.query;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.test.common.InfinispanSpringDataTest;
 import org.infinispan.test.example.Person;
 import org.infinispan.test.example.PersonRepository;
@@ -18,12 +16,19 @@ public class QueryTest extends InfinispanSpringDataTest {
    private PersonRepository personRepository;
 
    @Test
-   public void findByFirstname(@Autowired RemoteCacheManager remoteCacheManager) {
-      List<Person> emptyPeople = this.personRepository.findByFirstname("katia");
-      assertTrue(emptyPeople.isEmpty());
-      List<Person> people = this.personRepository.findByFirstname("oihana");
-      assertEquals(1, people.size());
+   public void findByFirstname() {
+      List<Person> emptyPeople = personRepository.findByFirstname("katia");
+      assertThat(emptyPeople).isEmpty();
+
+      List<Person> people = personRepository.findByFirstname("oihana");
+      assertThat(people).hasSize(1);
       Person person = people.get(0);
-      assertEquals("oihana", person.getFirstname());
+      assertThat(person.getFirstname()).isEqualTo("oihana");
+   }
+
+   @Test
+   public void countByFirstname() {
+      assertThat(personRepository.countByFirstname("katia")).isEqualTo(0);
+      assertThat(personRepository.countByFirstname("oihana")).isEqualTo(1);
    }
 }

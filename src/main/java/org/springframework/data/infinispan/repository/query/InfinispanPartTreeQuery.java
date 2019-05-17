@@ -3,11 +3,15 @@ package org.springframework.data.infinispan.repository.query;
 import java.lang.reflect.Constructor;
 
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.Search;
+import org.infinispan.query.dsl.QueryFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.keyvalue.core.KeyValueOperations;
 import org.springframework.data.keyvalue.core.query.KeyValueQuery;
 import org.springframework.data.keyvalue.repository.query.KeyValuePartTreeQuery;
 import org.springframework.data.repository.query.ParameterAccessor;
+import org.springframework.data.repository.query.Parameters;
+import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
@@ -28,6 +32,8 @@ public class InfinispanPartTreeQuery extends KeyValuePartTreeQuery {
    private final ConstructorCachingQueryCreatorFactory queryCreatorFactory;
    private final RemoteCacheManager remoteCacheManager;
    private final String keySpace;
+
+   private boolean isCountProjection;
 
    public InfinispanPartTreeQuery(
          QueryMethod queryMethod, QueryMethodEvaluationContextProvider evaluationContextProvider,
@@ -73,20 +79,26 @@ public class InfinispanPartTreeQuery extends KeyValuePartTreeQuery {
          return find(query, queryMethod);
       }
 
+      if(isCountProjection) {
+         return keyValueOperations.count(query, queryMethod.getEntityInformation().getJavaType());
+      }
+
       throw new UnsupportedOperationException(String.format("Query method '%s' not supported.", queryMethod.getName()));
    }
 
+   @Override
    public KeyValueQuery<?> createQuery(ParameterAccessor accessor) {
 
       PartTree tree = new PartTree(getQueryMethod().getName(), getQueryMethod().getEntityInformation().getJavaType());
 
-      InfinispanQueryCreator infinispanQueryCreator = new InfinispanQueryCreator(tree, accessor);
-      infinispanQueryCreator.setRemoteCache(remoteCacheManager.getCache(keySpace));
+      QueryFactory queryFactory = Search.getQueryFactory(remoteCacheManager.getCache(keySpace));
+      InfinispanQueryCreator infinispanQueryCreator = new InfinispanQueryCreator(tree, accessor, queryFactory);
       KeyValueQuery<?> query = infinispanQueryCreator.createQuery();
 
       if (tree.isLimiting()) {
          query.setRows(tree.getMaxResults());
       }
+      this.isCountProjection = tree.isCountProjection();
       return query;
    }
 
