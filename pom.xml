@@ -3,6 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-build-configuration-parent</artifactId>
+        <version>10.0.0.Beta3</version>
+    </parent>
 
     <groupId>org.infinispan</groupId>
     <artifactId>spring-data-infinispan</artifactId>
@@ -12,78 +17,187 @@
 
     <description>Spring Data module for Infinispan Remote Repositories.</description>
 
-    <parent>
-        <groupId>org.springframework.data.build</groupId>
-        <artifactId>spring-data-parent</artifactId>
-        <version>2.1.8.RELEASE</version>
-    </parent>
+
+    <scm>
+        <connection>scm:git:git@github.com:infinispan/spring-data-infinispan.git</connection>
+        <developerConnection>scm:git:git@github.com:infinispan/spring-data-infinispan.git</developerConnection>
+        <url>https://github.com/infinispan/spring-data-infinispan</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <comments>
+                Copyright 2008-2017 the original author or authors.
+
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
+
+                https://www.apache.org/licenses/LICENSE-2.0
+
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+                implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+            </comments>
+        </license>
+    </licenses>
 
     <properties>
-        <infinispan>10.0.0.Beta3</infinispan>
-        <junit.jupiter.version>5.3.1</junit.jupiter.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springdata.keyvalue>2.1.8.RELEASE</springdata.keyvalue>
         <jboss.releases.nexus.url>https://repository.jboss.org/nexus</jboss.releases.nexus.url>
         <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
         <jboss.releases.repo.url>${jboss.releases.nexus.url}/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
-        <version.maven.failsafe>3.0.0-M3</version.maven.failsafe>
-        <version.maven.surefire>3.0.0-M3</version.maven.surefire>
+        <version.infinispan>10.0.0.Beta3</version.infinispan>
+        <version.springdata.keyvalue>2.1.8.RELEASE</version.springdata.keyvalue>
+        <version.maven.failsafe>2.22.0</version.maven.failsafe>
+        <version.maven.surefire>2.22.0</version.maven.surefire>
         <version.maven.source>3.0.1</version.maven.source>
         <version.maven.scm>1</version.maven.scm>
+        <version.junit.jupiter>5.3.1</version.junit.jupiter>
+        <version.checkstyle.maven-plugin>2.17</version.checkstyle.maven-plugin>
+        <version.checkstyle>8.1</version.checkstyle>
+        <version.assertj>3.12.1</version.assertj>
+        <version.junit.platform>1.1.0</version.junit.platform>
+        <version.infinispan-junit5>0.2-SNAPSHOT</version.infinispan-junit5>
+        <version.spring>5.1.7.RELEASE</version.spring>
+        <version.jackson>2.9.8</version.jackson>
+        <version.lombok>1.18.6</version.lombok>
+        <version.reactor>Californium-SR6</version.reactor>
     </properties>
 
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-bom</artifactId>
+                <version>${version.reactor}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${version.spring}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${version.jackson}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-keyvalue</artifactId>
-            <version>${springdata.keyvalue}</version>
+            <version>${version.springdata.keyvalue}</version>
         </dependency>
 
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-client-hotrod</artifactId>
-            <version>${infinispan}</version>
+            <version>${version.infinispan}</version>
         </dependency>
 
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-query-dsl</artifactId>
-            <version>${infinispan}</version>
+            <version>${version.infinispan}</version>
         </dependency>
 
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-remote-query-client</artifactId>
-            <version>${infinispan}</version>
+            <version>${version.infinispan}</version>
+        </dependency>
+
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${version.lombok}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>${version.junit.jupiter}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>${version.junit.jupiter}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-junit5</artifactId>
-            <version>0.2-SNAPSHOT</version>
+            <version>${version.infinispan-junit5}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${version.assertj}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>delombok</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>package-javadoc</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <phase>package</phase>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <artifactId>maven-scm-plugin</artifactId>
                     <version>${version.maven.scm}</version>
@@ -94,6 +208,19 @@
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${version.maven.source}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>1.6.8</version>
+                    <configuration>
+                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        <stagingDescription>${infinispan-springboot.brand.name} ${project.version} release</stagingDescription>
+                        <nexusUrl>${jboss.releases.nexus.url}</nexusUrl>
+                        <serverId>${jboss.releases.repo.id}</serverId>
+                        <stagingProfileId>2161b7b8da0080</stagingProfileId>
+                        <stagingRepositoryId>${stagingRepositoryId}</stagingRepositoryId>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -126,4 +253,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
