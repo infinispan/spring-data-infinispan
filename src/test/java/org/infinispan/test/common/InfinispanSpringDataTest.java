@@ -1,6 +1,8 @@
 package org.infinispan.test.common;
 
 import static org.infinispan.query.remote.client.ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME;
+import static org.infinispan.test.example.TestData.ELAIA;
+import static org.infinispan.test.example.TestData.OIHANA;
 
 import java.io.IOException;
 
@@ -29,11 +31,9 @@ public abstract class InfinispanSpringDataTest {
       public RemoteCacheManager remoteCacheManager() {
          RemoteCacheManager cacheManager = server.hotRodClient();
          RemoteCache<String, Person> people = cacheManager.getCache("people");
-         Person oihana = new Person();
-         oihana.setId("1");
-         oihana.setFirstname("oihana");
-         oihana.setLastname("aresti");
-         people.put(oihana.getId(), oihana);
+
+         people.put(OIHANA.getId(), OIHANA);
+         people.put(ELAIA.getId(), ELAIA);
          return cacheManager;
       }
    }
