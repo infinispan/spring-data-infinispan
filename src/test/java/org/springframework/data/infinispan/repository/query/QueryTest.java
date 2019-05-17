@@ -13,6 +13,11 @@ import org.infinispan.test.example.Person;
 import org.infinispan.test.example.PersonRepository;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Verifies query support Infinispan and Spring-Data
+ *
+ * @author Katia Aresti
+ */
 public class QueryTest extends InfinispanSpringDataTest {
 
    @Resource

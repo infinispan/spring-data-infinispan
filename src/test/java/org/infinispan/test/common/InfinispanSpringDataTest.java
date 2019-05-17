@@ -20,8 +20,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+/**
+ * JUnit 5 base clase for testing using {@link InfinispanServerExtension}
+ */
 @SpringJUnitConfig({TestConfig.class, InfinispanSpringDataTest.InfinispanServerConfg.class})
 public abstract class InfinispanSpringDataTest {
+
    @RegisterExtension
    public static InfinispanServerExtension server = InfinispanServerExtension.builder().withCaches("people").stopAfterAll(false).build();
 
