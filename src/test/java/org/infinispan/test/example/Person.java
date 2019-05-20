@@ -29,15 +29,19 @@ public class Person implements Serializable {
    @ProtoField(number = 5, defaultValue = "false")
    boolean isBigSister;
 
+   @ProtoField(number = 6, defaultValue = "0")
+   int age;
+
    public Person() {
    }
 
-   public Person(String id, String firstname, String lastname, boolean isBasque, boolean isBigSister) {
+   public Person(String id, String firstname, String lastname, boolean isBasque, boolean isBigSister, int age) {
       this.id = id;
       this.firstname = firstname;
       this.lastname = lastname;
       this.isBasque = isBasque;
       this.isBigSister = isBigSister;
+      this.age = age;
    }
 
    @Override
@@ -49,11 +53,12 @@ public class Person implements Serializable {
             Objects.equals(firstname, person.firstname) &&
             Objects.equals(lastname, person.lastname) &&
             Objects.equals(isBasque, person.isBasque) &&
-            Objects.equals(isBigSister, person.isBigSister);
+            Objects.equals(isBigSister, person.isBigSister) &&
+            Objects.equals(age, person.age);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hash(id, firstname, lastname, isBasque, isBigSister);
+      return Objects.hash(id, firstname, lastname, isBasque, isBigSister, age);
    }
 }

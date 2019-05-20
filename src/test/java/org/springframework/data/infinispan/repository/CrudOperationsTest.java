@@ -2,7 +2,9 @@ package org.springframework.data.infinispan.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.infinispan.test.example.TestData.ELAIA;
+import static org.infinispan.test.example.TestData.JULIEN;
 import static org.infinispan.test.example.TestData.OIHANA;
+import static org.infinispan.test.example.TestData.RAMON;
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,12 +99,10 @@ public class CrudOperationsTest extends InfinispanSpringDataTest {
 
    @Test
    public void saveAndDeleteById() {
-      Person person = new Person("3", "julien", "rossito", false, false);
+      Person save = personRepository.save(JULIEN);
+      assertThat(save).isEqualTo(JULIEN);
 
-      Person save = personRepository.save(person);
-      assertThat(save).isEqualTo(person);
-
-      assertThat(peopleCache.get("3")).isEqualTo(person);
+      assertThat(peopleCache.get("3")).isEqualTo(JULIEN);
 
       personRepository.deleteById("3");
       assertThat(peopleCache.get("3")).isNull();
@@ -110,14 +110,11 @@ public class CrudOperationsTest extends InfinispanSpringDataTest {
 
    @Test
    public void saveAllAndDeleteAll() {
-      Person person1 = new Person("3", "julien", "rossito", false, false);
-      Person person2 = new Person("4", "ramon", "steinur", false, false);
-
-      Iterable<Person> people = Arrays.asList(person1, person2);
+      Iterable<Person> people = Arrays.asList(JULIEN, RAMON);
       personRepository.saveAll(people);
 
-      assertThat(peopleCache.get("3")).isEqualTo(person1);
-      assertThat(peopleCache.get("4")).isEqualTo(person2);
+      assertThat(peopleCache.get("3")).isEqualTo(JULIEN);
+      assertThat(peopleCache.get("4")).isEqualTo(RAMON);
 
       personRepository.deleteAll(people);
       assertThat(peopleCache.get("3")).isNull();
@@ -126,12 +123,11 @@ public class CrudOperationsTest extends InfinispanSpringDataTest {
 
    @Test
    public void saveAndDelete() {
-      Person person1 = new Person("3", "julien", "rossito", false, false);
-      personRepository.save(person1);
+      personRepository.save(JULIEN);
 
-      assertThat(peopleCache.get("3")).isEqualTo(person1);
+      assertThat(peopleCache.get("3")).isEqualTo(JULIEN);
 
-      personRepository.delete(person1);
+      personRepository.delete(JULIEN);
       assertThat(peopleCache.get("3")).isNull();
    }
 }
