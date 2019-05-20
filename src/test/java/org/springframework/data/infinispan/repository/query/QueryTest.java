@@ -122,13 +122,13 @@ public class QueryTest extends InfinispanSpringDataTest {
 
    @Test
    public void findByAgeIsIn() {
-      List<Person> people = personRepository.findByAgeIsIn(Arrays.asList(0,1,2));
+      List<Person> people = personRepository.findByAgeIsIn(Arrays.asList(0, 1, 2));
       assertThat(people).containsExactlyInAnyOrder(ELAIA);
    }
 
    @Test
    public void findByAgeIsNotIn() {
-      List<Person> people = personRepository.findByAgeIsNotIn(Arrays.asList(0,1,2));
+      List<Person> people = personRepository.findByAgeIsNotIn(Arrays.asList(0, 1, 2));
       assertThat(people).containsExactlyInAnyOrder(OIHANA);
    }
 
@@ -172,6 +172,26 @@ public class QueryTest extends InfinispanSpringDataTest {
 
       List<Person> people2 = personRepository.findByFirstnameNotContaining(Arrays.asList("oihana"));
       assertThat(people2).containsExactlyInAnyOrder(ELAIA);
+   }
+
+   @Test
+   public void findByFirstnameOrLastname() {
+      List<Person> people2 = personRepository.findByFirstnameOrLastname(ELAIA.getFirstname(), OIHANA.getLastname());
+      assertThat(people2).containsExactlyInAnyOrder(ELAIA, OIHANA);
+   }
+
+   @Test
+   public void findByFirstnameOrAgeBetween() {
+      List<Person> people2 = personRepository.findByFirstnameOrAgeBetween(ELAIA.getFirstname(), 1, 10);
+      assertThat(people2).containsExactlyInAnyOrder(ELAIA, OIHANA);
+   }
+
+   @Test
+   public void findByFirstnameAndLastname() {
+      List<Person> people1 = personRepository.findByFirstnameAndLastname(ELAIA.getFirstname(), OIHANA.getLastname());
+      assertThat(people1).isEmpty();
+      List<Person> people2 = personRepository.findByFirstnameAndLastname(OIHANA.getFirstname(), OIHANA.getLastname());
+      assertThat(people2).containsExactlyInAnyOrder(OIHANA);
    }
 
    @Test

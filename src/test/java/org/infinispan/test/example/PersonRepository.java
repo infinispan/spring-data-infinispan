@@ -55,5 +55,9 @@ public interface PersonRepository extends InfinispanRepository<Person, String> {
 
    List<Person> findByFirstnameNotContaining(Collection<String> firstNames);
 
+   List<Person> findByFirstnameOrLastname(String firstName, String lastName);
 
+   List<Person> findByFirstnameOrAgeBetween(String firstName, int ageMin, int ageMax);
+
+   List<Person> findByFirstnameAndLastname(String firstname, String lastname);
 }

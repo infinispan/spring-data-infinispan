@@ -3,6 +3,8 @@ package org.springframework.data.infinispan.repository.support;
 import java.lang.reflect.Method;
 
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.Search;
+import org.infinispan.query.dsl.QueryFactory;
 import org.springframework.data.infinispan.repository.query.InfinispanPartTreeQuery;
 import org.springframework.data.keyvalue.core.KeyValueOperations;
 import org.springframework.data.projection.ProjectionFactory;
@@ -12,7 +14,6 @@ import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
-import org.springframework.util.Assert;
 
 public class InfinispanQueryLookupStrategy implements QueryLookupStrategy {
 
@@ -42,7 +43,12 @@ public class InfinispanQueryLookupStrategy implements QueryLookupStrategy {
          return new IckleQueryRepositoryQuery(queryMethod, remoteCacheManager);
       }
 
-      return new InfinispanPartTreeQuery(queryMethod, evaluationContextProvider, this.keyValueOperations, new InfinispanPartTreeQuery.ConstructorCachingQueryCreatorFactory(this.queryCreator), queryMethod.getKeySpace(), remoteCacheManager);
+      QueryFactory queryFactory = Search.getQueryFactory(remoteCacheManager.getCache(queryMethod.getKeySpace()));
+
+      return new InfinispanPartTreeQuery(queryMethod, evaluationContextProvider,
+            this.keyValueOperations,
+            new InfinispanPartTreeQuery.ConstructorCachingQueryCreatorFactory(this.queryCreator),
+            queryFactory);
    }
 
 }

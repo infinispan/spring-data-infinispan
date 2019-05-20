@@ -1,16 +1,13 @@
 package org.springframework.data.infinispan.repository.query;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
+import org.infinispan.commons.util.ReflectionUtil;
 import org.infinispan.query.dsl.FilterConditionContext;
-import org.infinispan.query.dsl.FilterConditionContextQueryBuilder;
 import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
-import org.infinispan.query.dsl.RangeConditionContextQueryBuilder;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.keyvalue.core.query.KeyValueQuery;
@@ -18,9 +15,11 @@ import org.springframework.data.repository.query.ParameterAccessor;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
 import org.springframework.data.repository.query.parser.Part;
 import org.springframework.data.repository.query.parser.PartTree;
-import org.springframework.util.Assert;
 
-public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<QueryBuilder>, QueryBuilder> {
+/**
+ * @author Katia Aresti
+ */
+public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<FilterConditionContext>, FilterConditionContext> {
 
    private QueryFactory queryFactory;
 
@@ -34,44 +33,43 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
    }
 
    @Override
-   protected QueryBuilder create(Part part, Iterator<Object> iterator) {
-      return queryBuilder(part, iterator);
+   protected FilterConditionContext create(Part part, Iterator<Object> iterator) {
+      return createFilterConditionContext(part, iterator);
    }
 
    @Override
-   protected QueryBuilder and(Part part, QueryBuilder base, Iterator<Object> iterator) {
-//      QueryBuilder andFilter = queryBuilder(part, iterator);
-//      if(base instanceof FilterConditionContextQueryBuilder && andFilter instanceof FilterConditionContext) {
-//         FilterConditionContextQueryBuilder filterBase = (FilterConditionContextQueryBuilder) base;
-//         filterBase.and();
-//      }
-//      if(base instanceof RangeConditionContextQueryBuilder) {
-//         RangeConditionContextQueryBuilder baseRange = (RangeConditionContextQueryBuilder) base;
-//         FilterConditionContextQueryBuilder
-//         baseRange.and(andFilter)
-//      }
-      return null;//base.and(andFilter);
+   protected FilterConditionContext and(Part part, FilterConditionContext base, Iterator<Object> iterator) {
+      FilterConditionContext filterConditionContext = createFilterConditionContext(part, iterator);
+      resetQueryBuilder(filterConditionContext);
+      return base.and(filterConditionContext);
    }
 
    @Override
-   protected QueryBuilder or(QueryBuilder base, QueryBuilder criteria) {
-      return null; //base.or(criteria);
+   protected FilterConditionContext or(FilterConditionContext base, FilterConditionContext criteria) {
+      resetQueryBuilder(criteria);
+      return base.or(criteria);
+   }
+
+   private void resetQueryBuilder(FilterConditionContext criteria) {
+      // If we don't reset to null query builder we get ISPN014810: The given condition is already in use by another builder
+      Field queryBuilder = ReflectionUtil.getField("createFilterConditionContext", criteria.getClass());
+      ReflectionUtil.setAccessibly(criteria, queryBuilder, null);
    }
 
    @Override
-   protected KeyValueQuery<QueryBuilder> complete(QueryBuilder criteria, Sort sort) {
+   protected KeyValueQuery<FilterConditionContext> complete(FilterConditionContext criteria, Sort sort) {
       //TODO: SORT!!!!
 
       return new KeyValueQuery<>(criteria);
    }
 
-   private QueryBuilder queryBuilder(Part part, Iterator iterator) {
+   private FilterConditionContext createFilterConditionContext(Part part, Iterator iterator) {
       String property = part.getProperty().toDotPath();
       Part.Type type = part.getType();
-      QueryBuilder from = queryFactory.from(part.getProperty().getOwningType().getType().getName());
+      QueryBuilder from = queryFactory.from(part.getProperty().getOwningType().getType());
 
       Object firstParam = null;
-      if(iterator.hasNext()) {
+      if (iterator.hasNext()) {
          firstParam = iterator.next();
       }
 
@@ -89,12 +87,12 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
          case GREATER_THAN_EQUAL:
             return from.having(property).gte(firstParam);
          case IN:
-            if(firstParam instanceof Collection) {
+            if (firstParam instanceof Collection) {
                return from.having(property).in((Collection) firstParam);
             } else throw new IllegalArgumentException("IN query needs a Collection");
 
          case NOT_IN:
-            if(firstParam instanceof Collection) {
+            if (firstParam instanceof Collection) {
                return from.not().having(property).in((Collection) firstParam);
             } else throw new IllegalArgumentException("NOT IN query needs a Collection");
 
@@ -107,13 +105,13 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
          case IS_NOT_NULL:
             return from.not().having(property).isNull();
          case SIMPLE_PROPERTY:
-            if(shouldIgnoreCase(part, firstParam)) {
+            if (shouldIgnoreCase(part, firstParam)) {
                return from.having(property).like(((String) firstParam).toLowerCase());
             } else {
                return from.having(property).eq(firstParam);
             }
          case NEGATING_SIMPLE_PROPERTY:
-            if(shouldIgnoreCase(part, firstParam)) {
+            if (shouldIgnoreCase(part, firstParam)) {
                return from.not().having(property).like(((String) firstParam).toLowerCase());
             } else {
                return from.not().having(property).eq(firstParam);
@@ -127,13 +125,13 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<Q
          case ENDING_WITH:
             return from.having(property).like("%" + firstParam);
          case CONTAINING:
-            if(firstParam instanceof Collection) {
+            if (firstParam instanceof Collection) {
                return from.having(property).containsAny((Collection) firstParam);
             } else {
                return from.having(property).contains(firstParam);
             }
          case NOT_CONTAINING:
-            if(firstParam instanceof Collection) {
+            if (firstParam instanceof Collection) {
                return from.not().having(property).containsAll((Collection) firstParam);
             } else {
                return from.not().having(property).contains(firstParam);

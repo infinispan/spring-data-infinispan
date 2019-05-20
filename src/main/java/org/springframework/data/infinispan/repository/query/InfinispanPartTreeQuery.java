@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.Search;
+import org.infinispan.query.dsl.QueryBuilder;
 import org.infinispan.query.dsl.QueryFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.keyvalue.core.KeyValueOperations;
@@ -30,23 +31,20 @@ public class InfinispanPartTreeQuery extends KeyValuePartTreeQuery {
    private final QueryMethod queryMethod;
    private final KeyValueOperations keyValueOperations;
    private final ConstructorCachingQueryCreatorFactory queryCreatorFactory;
-   private final RemoteCacheManager remoteCacheManager;
-   private final String keySpace;
 
    private boolean isCountProjection;
+   private QueryFactory queryFactory;
 
    public InfinispanPartTreeQuery(
          QueryMethod queryMethod, QueryMethodEvaluationContextProvider evaluationContextProvider,
          KeyValueOperations keyValueOperations,
          ConstructorCachingQueryCreatorFactory queryCreatorFactory,
-         String keySpace,
-         RemoteCacheManager remoteCacheManager) {
+         QueryFactory queryFactory) {
       super(queryMethod, evaluationContextProvider, keyValueOperations, queryCreatorFactory);
       this.queryMethod = queryMethod;
       this.keyValueOperations = keyValueOperations;
       this.queryCreatorFactory = queryCreatorFactory;
-      this.remoteCacheManager = remoteCacheManager;
-      this.keySpace = keySpace;
+      this.queryFactory = queryFactory;
    }
 
    public static class ConstructorCachingQueryCreatorFactory
@@ -89,9 +87,10 @@ public class InfinispanPartTreeQuery extends KeyValuePartTreeQuery {
    @Override
    public KeyValueQuery<?> createQuery(ParameterAccessor accessor) {
 
-      PartTree tree = new PartTree(getQueryMethod().getName(), getQueryMethod().getEntityInformation().getJavaType());
+      Class<?> javaType = getQueryMethod().getEntityInformation().getJavaType();
 
-      QueryFactory queryFactory = Search.getQueryFactory(remoteCacheManager.getCache(keySpace));
+      PartTree tree = new PartTree(getQueryMethod().getName(), javaType);
+
       InfinispanQueryCreator infinispanQueryCreator = new InfinispanQueryCreator(tree, accessor, queryFactory);
       KeyValueQuery<?> query = infinispanQueryCreator.createQuery();
 
