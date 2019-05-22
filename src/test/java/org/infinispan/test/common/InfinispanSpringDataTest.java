@@ -14,8 +14,11 @@ import org.infinispan.protostream.annotations.ProtoSchemaBuilder;
 import org.infinispan.test.example.Person;
 import org.infinispan.test.example.TestConfig;
 import org.infinispan.test.jupiter.InfinispanServerExtension;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -34,19 +37,15 @@ public abstract class InfinispanSpringDataTest {
       @Bean
       public RemoteCacheManager remoteCacheManager() {
          RemoteCacheManager cacheManager = server.hotRodClient();
-         RemoteCache<String, Person> people = cacheManager.getCache("people");
-
-         people.put(OIHANA.getId(), OIHANA);
-         people.put(ELAIA.getId(), ELAIA);
          return cacheManager;
       }
    }
 
    @BeforeAll
    public static void serializationContext() throws IOException {
-
       // Get the serialization context of the client
-      SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(server.hotRodClient());
+      RemoteCacheManager remoteCacheManager = server.hotRodClient();
+      SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(remoteCacheManager);
 
       // Use ProtoSchemaBuilder to define a Protobuf schema on the client
       ProtoSchemaBuilder protoSchemaBuilder = new ProtoSchemaBuilder();
@@ -59,10 +58,22 @@ public abstract class InfinispanSpringDataTest {
 
       // Retrieve metadata cache
       RemoteCache<String, String> metadataCache =
-            server.hotRodClient().getCache(PROTOBUF_METADATA_CACHE_NAME);
+            remoteCacheManager.getCache(PROTOBUF_METADATA_CACHE_NAME);
 
       // Define the new schema on the server too
       metadataCache.put(fileName, protoFile);
    }
 
+   @BeforeEach
+   public void insertData(@Autowired RemoteCacheManager cacheManager) {
+      RemoteCache<String, Person> people = cacheManager.getCache("people");
+      people.put(OIHANA.getId(), OIHANA);
+      people.put(ELAIA.getId(), ELAIA);
+   }
+
+   @AfterEach
+   public void clear(@Autowired RemoteCacheManager cacheManager) {
+      RemoteCache<String, Person> people = cacheManager.getCache("people");
+      people.clear();
+   }
 }

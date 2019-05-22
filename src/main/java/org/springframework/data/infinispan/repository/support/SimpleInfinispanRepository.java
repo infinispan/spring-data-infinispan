@@ -2,6 +2,7 @@ package org.springframework.data.infinispan.repository.support;
 
 import java.io.Serializable;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.infinispan.repository.InfinispanRepository;
 import org.springframework.data.keyvalue.core.KeyValueOperations;
 import org.springframework.data.keyvalue.repository.support.SimpleKeyValueRepository;
@@ -15,4 +16,8 @@ public class SimpleInfinispanRepository<T extends Serializable, ID extends Seria
         super(metadata, operations);
     }
 
+    @Override
+    public Iterable<T> findAll(Sort sort) {
+        return super.findAll(sort);
+    }
 }

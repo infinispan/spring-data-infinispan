@@ -24,10 +24,10 @@ public class Person implements Serializable {
    String lastname;
 
    @ProtoField(number = 4, defaultValue = "false")
-   boolean isBasque;
+   boolean basque;
 
    @ProtoField(number = 5, defaultValue = "false")
-   boolean isBigSister;
+   boolean bigSister;
 
    @ProtoField(number = 6, defaultValue = "0")
    int age;
@@ -39,8 +39,8 @@ public class Person implements Serializable {
       this.id = id;
       this.firstname = firstname;
       this.lastname = lastname;
-      this.isBasque = isBasque;
-      this.isBigSister = isBigSister;
+      this.basque = isBasque;
+      this.bigSister = isBigSister;
       this.age = age;
    }
 
@@ -52,13 +52,13 @@ public class Person implements Serializable {
       return Objects.equals(id, person.id) &&
             Objects.equals(firstname, person.firstname) &&
             Objects.equals(lastname, person.lastname) &&
-            Objects.equals(isBasque, person.isBasque) &&
-            Objects.equals(isBigSister, person.isBigSister) &&
+            Objects.equals(basque, person.basque) &&
+            Objects.equals(bigSister, person.bigSister) &&
             Objects.equals(age, person.age);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hash(id, firstname, lastname, isBasque, isBigSister, age);
+      return Objects.hash(id, firstname, lastname, basque, bigSister, age);
    }
 }

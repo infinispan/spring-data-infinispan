@@ -2,8 +2,11 @@ package org.springframework.data.infinispan.repository.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.infinispan.test.example.TestData.ELAIA;
+import static org.infinispan.test.example.TestData.JULIEN;
 import static org.infinispan.test.example.TestData.OIHANA;
+import static org.infinispan.test.example.TestData.RAMON;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +16,10 @@ import org.infinispan.test.common.InfinispanSpringDataTest;
 import org.infinispan.test.example.Person;
 import org.infinispan.test.example.PersonRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 /**
  * Verifies query support Infinispan and Spring-Data
@@ -68,13 +75,13 @@ public class QueryTest extends InfinispanSpringDataTest {
 
    @Test
    public void findByIsBasqueTrue() {
-      List<Person> people = personRepository.findByIsBasqueTrue();
+      List<Person> people = personRepository.findByBasqueTrue();
       assertThat(people).containsExactlyInAnyOrder(OIHANA, ELAIA);
    }
 
    @Test
    public void findByIsBigSisterFalse() {
-      List<Person> people = personRepository.findByIsBigSisterFalse();
+      List<Person> people = personRepository.findByBigSisterFalse();
       assertThat(people).containsExactlyInAnyOrder(ELAIA);
    }
 
@@ -176,14 +183,14 @@ public class QueryTest extends InfinispanSpringDataTest {
 
    @Test
    public void findByFirstnameOrLastname() {
-      List<Person> people2 = personRepository.findByFirstnameOrLastname(ELAIA.getFirstname(), OIHANA.getLastname());
-      assertThat(people2).containsExactlyInAnyOrder(ELAIA, OIHANA);
+      List<Person> people1 = personRepository.findByFirstnameOrLastname(ELAIA.getFirstname(), OIHANA.getLastname());
+      assertThat(people1).containsExactlyInAnyOrder(ELAIA, OIHANA);
    }
 
    @Test
    public void findByFirstnameOrAgeBetween() {
-      List<Person> people2 = personRepository.findByFirstnameOrAgeBetween(ELAIA.getFirstname(), 1, 10);
-      assertThat(people2).containsExactlyInAnyOrder(ELAIA, OIHANA);
+      List<Person> people1 = personRepository.findByFirstnameOrAgeBetween(ELAIA.getFirstname(), 1, 10);
+      assertThat(people1).containsExactlyInAnyOrder(ELAIA, OIHANA);
    }
 
    @Test
@@ -192,6 +199,26 @@ public class QueryTest extends InfinispanSpringDataTest {
       assertThat(people1).isEmpty();
       List<Person> people2 = personRepository.findByFirstnameAndLastname(OIHANA.getFirstname(), OIHANA.getLastname());
       assertThat(people2).containsExactlyInAnyOrder(OIHANA);
+   }
+
+   @Test
+   public void findByFirstnameSorted() {
+      personRepository.save(JULIEN);
+      personRepository.save(RAMON);
+      List<Person> people = personRepository.findByBigSisterFalse(Sort.by("id"));
+      assertThat(people).containsExactly(ELAIA, JULIEN, RAMON);
+   }
+
+   @Test
+   public void findPageable() {
+      personRepository.save(JULIEN);
+      personRepository.save(RAMON);
+      Page<Person> people = personRepository.findAll(PageRequest.of(0, 2, Sort.by("id").descending()));
+      assertThat(people).hasSize(2);
+      assertThat(people).containsExactly(RAMON, JULIEN);
+      Page<Person> people1 = personRepository.findAll(PageRequest.of(1, 2, Sort.by("id").descending()));
+      assertThat(people1).containsExactly(ELAIA, OIHANA);
+      assertThat(people).hasSize(2);
    }
 
    @Test

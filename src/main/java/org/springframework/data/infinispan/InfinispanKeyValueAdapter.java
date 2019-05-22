@@ -1,15 +1,22 @@
 package org.springframework.data.infinispan;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.Search;
+import org.infinispan.query.dsl.QueryBuilder;
 import org.springframework.data.keyvalue.core.AbstractKeyValueAdapter;
 import org.springframework.data.keyvalue.core.ForwardingCloseableIterator;
+import org.springframework.data.keyvalue.core.query.KeyValueQuery;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.util.Assert;
 
+/**
+ * @author Katia Aresti
+ */
 public class InfinispanKeyValueAdapter extends AbstractKeyValueAdapter {
 
    private RemoteCacheManager remoteCacheManager;
@@ -25,10 +32,20 @@ public class InfinispanKeyValueAdapter extends AbstractKeyValueAdapter {
    }
 
    @Override
-   public Object put(Object id, Object item, String cacheName) {
-      Assert.notNull(id, "Id must not be 'null' for adding.");
-      Assert.notNull(item, "Item must not be 'null' for adding.");
+   public <T> Iterable<T> find(KeyValueQuery<?> query, String keyspace, Class<T> type) {
+      KeyValueQuery<?> keyValueQuery = query;
+      if(query.getCriteria() == null) {
+         QueryBuilder from = Search.getQueryFactory(remoteCacheManager.getCache(keyspace)).from(type);
+         keyValueQuery = new KeyValueQuery<>(from);
+         keyValueQuery.setSort(query.getSort());
+         keyValueQuery.setRows(query.getRows());
+         keyValueQuery.setOffset(query.getOffset());
+      }
+      return super.find(keyValueQuery, keyspace, type);
+   }
 
+   @Override
+   public Object put(Object id, Object item, String cacheName) {
       return getCache(cacheName).put(id, item);
    }
 

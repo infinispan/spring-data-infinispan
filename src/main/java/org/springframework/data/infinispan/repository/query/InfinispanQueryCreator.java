@@ -17,6 +17,8 @@ import org.springframework.data.repository.query.parser.Part;
 import org.springframework.data.repository.query.parser.PartTree;
 
 /**
+ * InfinispanQueryCreator extends {@link AbstractQueryCreator} and translates into Infinispan {@link FilterConditionContext}
+ *
  * @author Katia Aresti
  */
 public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<FilterConditionContext>, FilterConditionContext> {
@@ -52,15 +54,15 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<F
 
    private void resetQueryBuilder(FilterConditionContext criteria) {
       // If we don't reset to null query builder we get ISPN014810: The given condition is already in use by another builder
-      Field queryBuilder = ReflectionUtil.getField("createFilterConditionContext", criteria.getClass());
-      ReflectionUtil.setAccessibly(criteria, queryBuilder, null);
+      Field queryFactory = ReflectionUtil.getField("queryBuilder", criteria.getClass());
+      ReflectionUtil.setAccessibly(criteria, queryFactory, null);
    }
 
    @Override
    protected KeyValueQuery<FilterConditionContext> complete(FilterConditionContext criteria, Sort sort) {
-      //TODO: SORT!!!!
-
-      return new KeyValueQuery<>(criteria);
+      KeyValueQuery<FilterConditionContext> keyValueQuery = new KeyValueQuery<>(criteria);
+      keyValueQuery.setSort(sort);
+      return keyValueQuery;
    }
 
    private FilterConditionContext createFilterConditionContext(Part part, Iterator iterator) {

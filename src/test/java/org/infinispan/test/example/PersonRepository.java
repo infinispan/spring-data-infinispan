@@ -4,6 +4,8 @@ package org.infinispan.test.example;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.infinispan.repository.InfinispanRepository;
 
 public interface PersonRepository extends InfinispanRepository<Person, String> {
@@ -19,11 +21,9 @@ public interface PersonRepository extends InfinispanRepository<Person, String> {
 
    List<Person> findByLastnameIsNotNull();
 
-   List<Person> findByIsBasqueTrue();
+   List<Person> findByBasqueTrue();
 
-   List<Person> findByIsBigSisterFalse();
-
-   Long countByFirstname(String firstname);
+   List<Person> findByBigSisterFalse();
 
    List<Person> findByAgeBetween(int min, int max);
 
@@ -60,4 +60,8 @@ public interface PersonRepository extends InfinispanRepository<Person, String> {
    List<Person> findByFirstnameOrAgeBetween(String firstName, int ageMin, int ageMax);
 
    List<Person> findByFirstnameAndLastname(String firstname, String lastname);
+
+   List<Person> findByBigSisterFalse(Sort sort);
+
+   Long countByFirstname(String firstname);
 }
