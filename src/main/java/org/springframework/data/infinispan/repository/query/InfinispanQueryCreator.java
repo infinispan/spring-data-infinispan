@@ -17,7 +17,8 @@ import org.springframework.data.repository.query.parser.Part;
 import org.springframework.data.repository.query.parser.PartTree;
 
 /**
- * InfinispanQueryCreator extends {@link AbstractQueryCreator} and translates into Infinispan {@link FilterConditionContext}
+ * InfinispanQueryCreator extends {@link AbstractQueryCreator} and translates into Infinispan {@link
+ * FilterConditionContext}
  *
  * @author Katia Aresti
  */
@@ -138,6 +139,8 @@ public class InfinispanQueryCreator extends AbstractQueryCreator<KeyValueQuery<F
             } else {
                return from.not().having(property).contains(firstParam);
             }
+         case REGEX:
+            throw new UnsupportedOperationException("Infinispan query supports JPA like Query, not Regex");
          default:
             throw new InvalidDataAccessApiUsageException(String.format("Unsupported type '%s'", type));
       }

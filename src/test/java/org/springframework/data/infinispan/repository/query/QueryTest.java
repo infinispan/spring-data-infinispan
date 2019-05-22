@@ -5,10 +5,12 @@ import static org.infinispan.test.example.TestData.ELAIA;
 import static org.infinispan.test.example.TestData.JULIEN;
 import static org.infinispan.test.example.TestData.OIHANA;
 import static org.infinispan.test.example.TestData.RAMON;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -18,7 +20,6 @@ import org.infinispan.test.example.PersonRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 /**
@@ -211,6 +212,17 @@ public class QueryTest extends InfinispanSpringDataTest {
 
    @Test
    public void findPageable() {
+      Iterable<Person> people = personRepository.findAll(Sort.by("firstname").ascending());
+      assertThat(people).hasSize(2);
+      assertThat(people).containsExactly(ELAIA, OIHANA);
+
+      Iterable<Person> people2 = personRepository.findAll(Sort.by("firstname").descending());
+      assertThat(people2).hasSize(2);
+      assertThat(people2).containsExactly(OIHANA, ELAIA);
+   }
+
+   @Test
+   public void findPageableSorted() {
       personRepository.save(JULIEN);
       personRepository.save(RAMON);
       Page<Person> people = personRepository.findAll(PageRequest.of(0, 2, Sort.by("id").descending()));
@@ -219,6 +231,19 @@ public class QueryTest extends InfinispanSpringDataTest {
       Page<Person> people1 = personRepository.findAll(PageRequest.of(1, 2, Sort.by("id").descending()));
       assertThat(people1).containsExactly(ELAIA, OIHANA);
       assertThat(people).hasSize(2);
+   }
+
+   @Test
+   public void findByFirstnameRegex() {
+      assertThrows(UnsupportedOperationException.class, () -> personRepository.findByFirstnameRegex("o*"));
+   }
+
+   @Test
+   public void findOneByFirstnameAsync() throws Exception {
+      CompletableFuture<Person> personCf = personRepository.findOneByFirstname(OIHANA.getFirstname());
+      Person person = personCf.get(1000, TimeUnit.SECONDS);
+
+      assertThat(person).isEqualTo(OIHANA);
    }
 
    @Test

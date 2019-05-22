@@ -1,6 +1,5 @@
 package org.springframework.data.infinispan;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -27,15 +26,12 @@ public class InfinispanKeyValueAdapter extends AbstractKeyValueAdapter {
       this.remoteCacheManager = remoteCacheManager;
    }
 
-   public void setRemoteCacheManager(RemoteCacheManager remoteCacheManager) {
-      this.remoteCacheManager = remoteCacheManager;
-   }
-
    @Override
    public <T> Iterable<T> find(KeyValueQuery<?> query, String keyspace, Class<T> type) {
       KeyValueQuery<?> keyValueQuery = query;
-      if(query.getCriteria() == null) {
-         QueryBuilder from = Search.getQueryFactory(remoteCacheManager.getCache(keyspace)).from(type);
+      if (query.getCriteria() == null) {
+         // If criteria is null, we need to start the query here
+         QueryBuilder from = Search.getQueryFactory(getCache(keyspace)).from(type);
          keyValueQuery = new KeyValueQuery<>(from);
          keyValueQuery.setSort(query.getSort());
          keyValueQuery.setRows(query.getRows());
@@ -45,8 +41,8 @@ public class InfinispanKeyValueAdapter extends AbstractKeyValueAdapter {
    }
 
    @Override
-   public Object put(Object id, Object item, String cacheName) {
-      return getCache(cacheName).put(id, item);
+   public Object put(Object id, Object item, String keyspace) {
+      return getCache(keyspace).put(id, item);
    }
 
    @Override
@@ -80,10 +76,6 @@ public class InfinispanKeyValueAdapter extends AbstractKeyValueAdapter {
             remoteCacheManager.getCache(cacheName).clear());
    }
 
-   protected RemoteCache<Object, Object> getCache(String cacheName) {
-      return remoteCacheManager.getCache(cacheName);
-   }
-
    @Override
    public void destroy() {
       this.remoteCacheManager.stop();
@@ -98,5 +90,9 @@ public class InfinispanKeyValueAdapter extends AbstractKeyValueAdapter {
    public CloseableIterator<Entry<Object, Object>> entries(String keyspace) {
       Iterator<Entry<Object, Object>> iterator = this.getCache(keyspace).entrySet().iterator();
       return new ForwardingCloseableIterator<>(iterator);
+   }
+
+   protected RemoteCache<Object, Object> getCache(String cacheName) {
+      return remoteCacheManager.getCache(cacheName);
    }
 }

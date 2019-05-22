@@ -3,10 +3,12 @@ package org.infinispan.test.example;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.infinispan.repository.InfinispanRepository;
+import org.springframework.scheduling.annotation.Async;
 
 public interface PersonRepository extends InfinispanRepository<Person, String> {
    List<Person> findByFirstname(String firstname);
@@ -63,5 +65,10 @@ public interface PersonRepository extends InfinispanRepository<Person, String> {
 
    List<Person> findByBigSisterFalse(Sort sort);
 
+   List<Person> findByFirstnameRegex(String regex);
+
    Long countByFirstname(String firstname);
+
+   @Async
+   CompletableFuture<Person> findOneByFirstname(String lastname);
 }
