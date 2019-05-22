@@ -247,6 +247,12 @@ public class QueryTest extends InfinispanSpringDataTest {
    }
 
    @Test
+   public void peopleWithTheirFirstnameIsOihana() {
+      List<Person> people = personRepository.peopleWithTheirFirstnameIsOihana();
+      assertThat(people).containsExactly(OIHANA);
+   }
+
+   @Test
    public void countByFirstname() {
       assertThat(personRepository.countByFirstname("nobody")).isEqualTo(0);
       assertThat(personRepository.countByFirstname("oihana")).isEqualTo(1);

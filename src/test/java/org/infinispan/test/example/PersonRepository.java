@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.infinispan.repository.InfinispanRepository;
+import org.springframework.data.infinispan.repository.query.InfinispanQuery;
 import org.springframework.scheduling.annotation.Async;
 
 public interface PersonRepository extends InfinispanRepository<Person, String> {
@@ -71,4 +72,8 @@ public interface PersonRepository extends InfinispanRepository<Person, String> {
 
    @Async
    CompletableFuture<Person> findOneByFirstname(String lastname);
+
+   @InfinispanQuery("from example.Person p where p.firstname = 'oihana'")
+   public List<Person> peopleWithTheirFirstnameIsOihana();
+
 }

@@ -1,8 +1,5 @@
 package org.springframework.data.infinispan.repository.support;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.Search;
 import org.infinispan.query.dsl.QueryFactory;
@@ -24,28 +21,10 @@ public class IckleQueryRepositoryQuery implements RepositoryQuery {
 
    @Override
    public Object execute(Object[] parameters) {
-      String queryStringTemplate = queryMethod.getAnnotatedQuery();
-      String queryString = String.format(queryStringTemplate, formatParameters(parameters));
+      String queryString = queryMethod.getAnnotatedQuery();
 
       QueryFactory queryFactory = Search.getQueryFactory(remoteCacheManager.getCache(keySpace));
-
       return queryFactory.create(queryString).list();
-   }
-
-   private Object[] formatParameters(Object[] parameters) {
-      Object[] result = new Object[parameters.length];
-      for (int i = 0; i < parameters.length; i++) {
-         if (parameters[i] instanceof Collection) {
-            result[i] = formatCollection((Collection) parameters[i]);
-         } else {
-            result[i] = parameters[i];
-         }
-      }
-      return result;
-   }
-
-   private static String formatCollection(Collection<?> collection) {
-      return String.format("(%s)", collection.stream().map(Object::toString).collect(Collectors.joining(",")));
    }
 
    @Override

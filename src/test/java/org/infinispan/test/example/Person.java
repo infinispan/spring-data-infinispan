@@ -13,6 +13,8 @@ import lombok.Data;
 @Data
 public class Person implements Serializable {
 
+   public static final String PACKAGE_NAME = "example";
+
    @Id
    @ProtoField(number = 1)
    String id;

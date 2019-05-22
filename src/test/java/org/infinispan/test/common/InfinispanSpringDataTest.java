@@ -51,7 +51,7 @@ public abstract class InfinispanSpringDataTest {
       ProtoSchemaBuilder protoSchemaBuilder = new ProtoSchemaBuilder();
       String fileName = "person.proto";
       String protoFile = protoSchemaBuilder
-            .packageName(Person.class.getPackage().getName())
+            .packageName(Person.PACKAGE_NAME)
             .fileName(fileName)
             .addClass(Person.class)
             .build(ctx);
